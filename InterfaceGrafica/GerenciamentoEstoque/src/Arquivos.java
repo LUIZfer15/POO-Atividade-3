@@ -1,8 +1,12 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +73,63 @@ public class Arquivos {
     private static Produto extrairObjetoDoArquivo(String linha) {
         Produto produto = new Produto();
         String[] split = linha.split("##");
-        produto.setId(split[0]);
-        produto.setNome(linha);
+        produto.setId(Integer.parseInt(split[0]));
+        produto.setNome(split[1]);
+        produto.setDescricao(split[2]);
+        produto.setPreco(Float.parseFloat(split[3]));
+        produto.setQuantidadeEstoque(Integer.parseInt(split[4]));
+        return produto;
+    }
+
+    public static void salvarBinario(Produto produto) {
+        OutputStream outputStream = null;
+        ObjectOutputStream objectStream = null;
+        try {
+            File file = new File(NOME_ARQUIVO_BINARIO);
+            outputStream = new FileOutputStream(file);
+            objectStream = new ObjectOutputStream(outputStream);
+            objectStream.writeObject(produto);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao salvar o veiculo em arquivo binário!");
+        } finally {
+            try {
+                if (objectStream != null) {
+                    objectStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (Exception e2) {
+                JOptionPane.showMessageDialog(null, "Erro ao fechar os arquivos!");
+            }
+        }
+    }
+
+    public static Produto carregarBinario() {
+        Produto produto = new Produto();
+        InputStream inputStream = null;
+        ObjectInputStream objectStream = null;
+        try {
+            File file = new File(NOME_ARQUIVO_BINARIO);
+            inputStream = new FileInputStream(file);
+            objectStream = new ObjectOutputStream(outputStream);
+            produto = (Produto) objectStream.readObject();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao carregar o veiculo do arquivo binário!");
+        } catch (ClassNotFoundException cnfe) {
+            JOptionPane.showMessageDialog(null, "Não foi possível converter o valor do arquivo para Produto!");
+        } finally {
+            try {
+                if (objectStream != null) {
+                    objectStream.close();
+                }
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Erro ao fechar os arquivos!");
+            }
+        }
+        return produto;
     }
 }
